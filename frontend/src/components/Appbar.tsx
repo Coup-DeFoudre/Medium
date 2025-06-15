@@ -83,7 +83,14 @@ const Appbar = ({ onPublish }: AppbarProps) => {
           </Link>
         )}
 
-        <Bell className="w-5 h-5 text-gray-700 cursor-pointer" />
+        <div className="relative group inline-block">
+          <Bell className="w-5 h-5 text-gray-700 cursor-pointer" />
+
+          {/* Tooltip */}
+          <div className="absolute left-1/2 top-full mt-2 transform -translate-x-1/2 px-3 py-1 text-sm text-gray-600 bg-white border border-gray-300 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+            No notifications
+          </div>
+        </div>
 
         {/* Avatar dropdown */}
         {tokenPresent && (

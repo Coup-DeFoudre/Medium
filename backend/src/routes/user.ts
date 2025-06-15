@@ -10,7 +10,9 @@ export const userRouter = new Hono<{
     DATABASE_URL: string;
     JWT_SECRET: string;
   };
-  Variables: {};
+  Variables: {
+    userId: string;
+  };
 }>();
 
 userRouter.post("/signup", async (c) => {
@@ -117,6 +119,7 @@ userRouter.get("/", async (c) => {
         id: true,
         name: true,
         email: true,
+        bio:true
       },
     });
 
@@ -129,5 +132,122 @@ userRouter.get("/", async (c) => {
   } catch (err) {
     c.status(500);
     return c.json({ error: "Failed to fetch user", details: err });
+  }
+});
+
+
+//update user
+userRouter.put("/", async (c) => {
+  // Get the logged-in user's ID from the verified JWT payload
+  const jwt = c.req.header("Authorization");
+
+  if (!jwt) {
+    c.status(401);
+    return c.json({ error: "Unauthorized: Missing token" });
+  }
+
+  try {
+    const token = jwt.split(" ")[1];
+    const payload = await verify(token, c.env.JWT_SECRET);
+
+    if (!payload || typeof payload.id !== "string") {
+      c.status(401);
+      return c.json({ error: "Unauthorized: Invalid token" });
+    }
+
+    // Optionally, you can also set the user id in context for future use
+    c.set("userId", payload.id);
+
+    const prisma = new PrismaClient({
+      datasourceUrl: c.env?.DATABASE_URL,
+    }).$extends(withAccelerate());
+
+    const body = await c.req.json();
+    const { name, bio } = body;
+
+    // Only allow updating name or bio
+    if (typeof name !== "string" && typeof bio !== "string") {
+      c.status(400);
+      return c.json({ error: "Nothing to update. Provide name or bio." });
+    }
+
+    const updateData: { name?: string; bio?: string } = {};
+    if (typeof name === "string") updateData.name = name;
+    if (typeof bio === "string") updateData.bio = bio;
+
+    const user = await prisma.user.update({
+      where: {
+        id: payload.id,
+      },
+      data: updateData,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+      },
+    });
+
+    return c.json({ user });
+  } catch (err) {
+    c.status(500);
+    return c.json({ error: "Failed to update user", details: err });
+  }
+});
+
+
+
+//change password 
+
+userRouter.put("/change-password", async (c) => {
+  const jwt = c.req.header("Authorization");
+
+  if (!jwt) {
+    c.status(401);
+    return c.json({ error: "Unauthorized: Missing token" });
+  }
+
+  try {
+    const token = jwt.split(" ")[1];
+    const payload = await verify(token, c.env.JWT_SECRET);
+
+    if (!payload || typeof payload.id !== "string") {
+      c.status(401);
+      return c.json({ error: "Unauthorized: Invalid token" });
+    }
+
+    const prisma = new PrismaClient({
+      datasourceUrl: c.env?.DATABASE_URL,
+    }).$extends(withAccelerate());
+
+    const body = await c.req.json();
+    const { oldPassword, newPassword } = body;
+
+    if (!oldPassword || !newPassword) {
+      c.status(400);
+      return c.json({ error: "Old and new passwords are required" });
+    }
+
+    // Verify old password
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+      select: { password: true },
+    });
+
+    if (!user || user.password !== oldPassword) {
+      c.status(403);
+      return c.json({ error: "Old password is incorrect" });
+    }
+
+    // Update to new password
+    await prisma.user.update({
+      where: { id: payload.id },
+      data: { password: newPassword },
+    });
+
+    return c.json({ message: "Password changed successfully" });
+  } catch (err) {
+    c.status(500);
+    return c.json({ error: "Failed to change password", details: err });
   }
 });

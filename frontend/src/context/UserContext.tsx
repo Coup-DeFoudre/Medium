@@ -1,12 +1,12 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import axios from "axios";
-
-const BACKEND_URL = "https://backend.iamrishabhpathak.workers.dev"; // or your env
+import { BACKEND_URL } from "../config";
 
 interface User {
   id: string;
   name: string;
   email: string;
+  bio?: string;
 }
 
 interface UserContextType {
