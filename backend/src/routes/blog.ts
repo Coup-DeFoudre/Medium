@@ -125,7 +125,7 @@ blogRouter.put("/", async (c) => {
       where: { id: data.id },
       data: {
         title: data.title,
-        content: data.content,
+        content: data.content
       },
     });
 
@@ -160,7 +160,7 @@ blogRouter.get("/bulk", async (c) => {
           content: true,
           createdAt: true,
           author: {
-            select: { name: true },
+            select: { name: true ,bio:true },
           },
         },
       }),

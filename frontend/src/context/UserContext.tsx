@@ -7,6 +7,14 @@ interface User {
   name: string;
   email: string;
   bio?: string;
+  posts?: Array<{
+    id: string; 
+    title: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    published: boolean;
+  }>;
 }
 
 interface UserContextType {

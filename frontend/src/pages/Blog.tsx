@@ -15,7 +15,7 @@ const Blog = () => {
   return (
     <div>
       <Appbar />
-      <div className="max-w-6xl mx-auto p-6">
+      <div className="max-w-6xl mx-auto p-6 ">
         {loading || !blog ? (
           <FullBlogSkeleton />
         ) : (

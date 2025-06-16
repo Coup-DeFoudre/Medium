@@ -8,6 +8,7 @@ import CreatePost from './pages/CreatePost'
 import Landing from './pages/Landing'
 import UserProfile from './pages/UserProfile'
 import UserDashBoard from './pages/UserDashBoard'
+import OurStoryPage from './pages/OurStory'
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
           <Route path='/create-blog' element={<CreatePost/>} />
           <Route path='/profile' element={<UserProfile/>} />
           <Route path = '/dashboard' element={<UserDashBoard/>} />
+          <Route path='/ourstory' element={<OurStoryPage/>} />
         </Routes>
       </BrowserRouter>
     </>

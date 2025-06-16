@@ -119,7 +119,9 @@ userRouter.get("/", async (c) => {
         id: true,
         name: true,
         email: true,
-        bio:true
+        bio:true,
+        posts:true
+
       },
     });
 
